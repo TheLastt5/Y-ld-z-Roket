@@ -19,5 +19,19 @@ int main() {
     char olmayanlar[30] = "";
 
     printf("Hedef Kelime %ld harfli!\n", strlen(hedef));
-    return 0;
+
+    while (1) {
+        printf("Girdi: ");
+        scanf("%s", tahmin);
+
+        // Küçük harfi büyük harfe çevirme kısmı
+        for(int i = 0; tahmin[i]; i++){
+            tahmin[i] = toupper(tahmin[i]);
+        }
+
+        if (strcmp(tahmin, hedef) == 0) {
+            printf("Tebrikler! Kelime: %s\n", hedef);
+            break;
+        }
+return 0;
 }
