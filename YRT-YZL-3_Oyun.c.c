@@ -24,7 +24,7 @@ int main() {
         printf("Girdi: ");
         scanf("%s", tahmin);
 
-        // Küçük harfi büyük harfe çevirme kısmı
+        // KÜÇÜK HARFİ BÜYÜK HARFE ÇEVİRME BLOĞU
         for(int i = 0; tahmin[i]; i++){
             tahmin[i] = toupper(tahmin[i]);
         }
@@ -33,5 +33,27 @@ int main() {
             printf("Tebrikler! Kelime: %s\n", hedef);
             break;
         }
-return 0;
+
+        for (int i = 0; i < strlen(tahmin); i++) {
+            if (tahmin[i] == hedef[i]) {
+                continue;
+            } else if (strchr(hedef, tahmin[i])) {
+                if (!strchr(yanlisYerde, tahmin[i])) {
+                    int len = strlen(yanlisYerde);
+                    yanlisYerde[len] = tahmin[i];
+                    yanlisYerde[len+1] = ',';
+                    yanlisYerde[len+2] = '\0';
+                }
+            } else {
+                if (!strchr(olmayanlar, tahmin[i])) {
+                    int len = strlen(olmayanlar);
+                    olmayanlar[len] = tahmin[i];
+                    olmayanlar[len+1] = ',';
+                    olmayanlar[len+2] = '\0';
+                }
+            }
+        }
+        durumuGoster(tahmin, hedef, yanlisYerde, olmayanlar);
+    }
+    return 0;
 }
