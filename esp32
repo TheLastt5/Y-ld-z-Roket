@@ -1,0 +1,26 @@
+uint8_t tek_harf; komutunu pv kısmına yazma sebebim  hem main hemde kesme beraber kullanır global bi fonksiyon olur 
+
+Satt hızları GPIO pinler ve usart2 donanımı vb ayarlanıp kullanımı hazır hale getirildiği kodlardan sonra gelir
+
+begin 2 kurma sebebimiz uart donanımı başlatıldıktan hemen sonraki güvenli yer olan BEGIN 2'yi kullanırız.
+MX_USART2_UART_Init() sayesinde uart donanımı ba
+
+void HAL_UART_RxCpltCallback bağımsız bir fonksiyondur bunu begin 1-2-3 gii yerlere yazılamaz hata verir
+
+HAL_UART_Receive_IT STM32'nin donanım kütüphanesinde "Arka planda (Kesme/Interrupt ile) dinlemeye başla" anlamına gelen fonksiyondur. Sonundaki IT (Interrupt), işlemcinin bu satırda donup kalmamasını, sadece bir alarm (zil) kurup işine devam etmesini sağlar.
+
+ HAL_UART_Receive_IT(&huart2, &tek_harf, 1); bu komutu yazma sebebimiz Mikrodenetleyiciler enerji tasarrufu ve güvenlik amacıyla, sen açıkça emir verene kadar hiçbir dış uyarıcıya tepki vermeyecek şekilde tasarlanmıştır bu yüzden bunu yazmassak ilk harf i alır ve orda kalır kesmeye gitmeyeceği içinde başka harf aldığında sistem taşması verir
+
+BEGIN Includes: Kütüphaneleri (#include <string.h> gibi) eklediğin yer.
+
+BEGIN PV: Global değişkenleri (tek_harf gibi) tanımladığın yer.
+
+BEGIN 0: main() fonksiyonu başlamadan hemen önceki son boş alan. (Buraya da kendi fonksiyonlarını yazabilirsin, tamamen sana kalmış!)
+
+BEGIN 1: main() içindedir ama işlemci henüz hiçbir ayarı yapmamıştır (Tehlikeli bölge).
+
+BEGIN 2: main() içindedir, donanım kurulmuştur, while(1) başlamamıştır (Zili kurduğumuz yer).
+
+BEGIN 3: while(1) sonsuz döngüsünün içidir.
+
+BEGIN 4: main() fonksiyonunun süslü parantezi } kapanıp bittikten sonraki uçsuz bucaksız alandır. Kendi yazdığın tüm acil durum (kesme) fonksiyonlarını ve özel algoritmalarını buraya alt alta dizersin. Alan sınırsızdır.
