@@ -24,3 +24,11 @@ BEGIN 2: main() içindedir, donanım kurulmuştur, while(1) başlamamıştır (Z
 BEGIN 3: while(1) sonsuz döngüsünün içidir.
 
 BEGIN 4: main() fonksiyonunun süslü parantezi } kapanıp bittikten sonraki uçsuz bucaksız alandır. Kendi yazdığın tüm acil durum (kesme) fonksiyonlarını ve özel algoritmalarını buraya alt alta dizersin. Alan sınırsızdır.
+
+HAL_ADC_PollForConversion bir donanımın durumunu sürekli kontrol etmeye "polling" denir.
+
+Conversion (Dönüşüm): Analog voltajın dijital bir sayıya (0-4095) dönüştürülme işlemidir.
+ 
+HAL_UART_Transmit UART üzerinden veri gönder
+
+Len Sepetin içinden kaç karakteri dışarı yollayayım
