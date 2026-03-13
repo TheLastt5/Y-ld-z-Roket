@@ -23,12 +23,26 @@ BEGIN 2: main() içindedir, donanım kurulmuştur, while(1) başlamamıştır (Z
 
 BEGIN 3: while(1) sonsuz döngüsünün içidir.
 
+  while (1)
+    {
+    	HAL_ADC_Start_IT(&hadc1); bunu yapma sebebimiz sürekli okuma yapıyoruz ama o domino taşları gibi birbirini takıp ediyor ama ilk vuruş için star_IT lazım
+
 BEGIN 4: main() fonksiyonunun süslü parantezi } kapanıp bittikten sonraki uçsuz bucaksız alandır. Kendi yazdığın tüm acil durum (kesme) fonksiyonlarını ve özel algoritmalarını buraya alt alta dizersin. Alan sınırsızdır.
 
 HAL_ADC_PollForConversion bir donanımın durumunu sürekli kontrol etmeye "polling" denir.
 
 Conversion (Dönüşüm): Analog voltajın dijital bir sayıya (0-4095) dönüştürülme işlemidir.
+
+ADC donanımının içinde hapsolur, işlemciye (CPU) asla ulaşamazdı. NVİC settingsdeki ayar sayesinde 
+
+Bu sayede void HAL_ADC_ConvCpltCallback Eğer ADC'den bir alarm gelirse, her şeyi bırak ve şu adresteki koda git."
  
 HAL_UART_Transmit UART üzerinden veri gönder
 
 Len Sepetin içinden kaç karakteri dışarı yollayayım
+
+Özellik,Continuous AÇIK (Sürekli),                     Continuous KAPALI (Tek Seferlik)
+Kimin Emriyle?,Donanım kendi kendine ölçer.             ,Sen Start komutu verince ölçer.
+İşlemci Yükü,Çok yüksek (Sürekli bölünür).,             Çok düşük (Ritmik bölünür).
+Seri Port Durumu,Kilitlenme riski çok yüksek.,              Güvenli ve okunabilir.
+Kullanım Alanı,Çok hızlı sinyal takibi (Osiloskop gibi).,   "Sensör okuma (Sıcaklık, Voltaj vb.)."
