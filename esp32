@@ -46,3 +46,11 @@ Kimin Emriyle?,Donanım kendi kendine ölçer.             ,Sen Start komutu ver
 İşlemci Yükü,Çok yüksek (Sürekli bölünür).,             Çok düşük (Ritmik bölünür).
 Seri Port Durumu,Kilitlenme riski çok yüksek.,              Güvenli ve okunabilir.
 Kullanım Alanı,Çok hızlı sinyal takibi (Osiloskop gibi).,   "Sensör okuma (Sıcaklık, Voltaj vb.)."
+
+void işini bitirdiğinde senin eline fiziksel olarak bir obje vermez. Sadece ondan istenen eylemi gerçekleştirmiş ve kenara çekilir sana bir int değeri gibi bir değer vermez
+
+uint32_t İşaretsiz 32-bit Tam Sayı Sadece 0 ve pozitif sayıları barındırır o yüzdende işaretsizdir
+
+void yrt_delay(uint32_t bekleme_suresi_ms) kısmındaki bekleme_sıresi_ms kısmı tekrar kullanılabilir olmasını sağlayan en kilit noktadır
+
+uint32_t baslangic_zamani = HAL_GetTick(); bunun nedeni ilk başlama zamanın not etmektir yemek pişmesi için fırına atıcaksan ilk saatte bakarsın onun gibi
