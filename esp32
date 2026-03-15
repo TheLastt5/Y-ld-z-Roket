@@ -60,3 +60,23 @@ while ((HAL_GetTick() - baslangic_zamani) < bekleme_suresi_ms)
 
     } 
 Burdaki ana amaç while ( (Şu Anki Saat - Başlangıç Saati) < Bekleme Süresi ) bizim istediğimiz saat olmadan döngüden çıkamaz ve devam eder bu yüzden while içi boş
+
+1. APB1 Hattı (Advanced Peripheral Bus 1)
+Bu hat, mikrodenetleyicinin nispeten "daha düşük hızlı" çevre birimlerinin bağlandığı otoyoldur.
+
+TIM2, TIM3, TIM4, TIM5 (Genel Amaçlı Timer'lar)
+
+TIM6 ve TIM7 (Temel - Basic Timer'lar)
+
+İletişim modülleri (I2C, bazı UART ve SPI hatları) donanımsal olarak bu hatta lehimlenmiş/bağlanmış gibidir.
+
+2. APB2 Hattı (Advanced Peripheral Bus 2)
+Bu hat, çok daha yüksek hız gerektiren "elit" çevre birimlerinin bağlandığı otoyoldur.
+
+TIM1 ve TIM8 (Gelişmiş - Advanced Timer'lar, o bahsettiğimiz motor sürme, karmaşık PWM işleri yapanlar)
+
+Yüksek hızlı ADC (Analog-Dijital Dönüştürücü) ve bazı özel iletişim hatları bu yola bağlıdır.
+
+Basic timer Sadece kendi içine kapalı bir şekilde sayar ve işlemciye haber verir (Interrupt). basic timer pwm üretemez
+
+General Purpose Timer Dış dünyaya açılan özel kapıları (Kanalları - Channels) vardır. İşlemcinin fiziksel pinlerine bağlanabilirler. Bu sayede dışarıdan gelen bir sinyali doğrudan okuyabilir veya dışarıya bir sinyal gönderebilirler.
