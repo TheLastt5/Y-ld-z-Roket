@@ -1,0 +1,106 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[turkish]{babel}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{graphicx}
+\geometry{a4paper, top=2cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\begin{document}
+
+\begin{center}
+    \includegraphics[width=0.90\textwidth]{ekran.png}
+    
+    \vspace{2cm}
+    
+    {\huge \textbf{STM32F446RE Gömülü Sistem Görev Raporu}\par}
+    
+    \vspace{1.5cm} 
+    
+    {\Large \textbf{Hazırlayan:} Emre Yılmaz\par}
+    
+    \vspace{0.5cm}
+    
+    {\large \today\par}
+\end{center}
+
+\thispagestyle{empty} 
+
+\newpage 
+
+\section*{Kesme (Interrupt) İle ADC Okuma Mantığı}
+
+Buradaki kodun ana amacı kesme yaparak potansiyometreden veri almaktır.
+
+\begin{lstlisting}[language=C, frame=single, numbers=none, breaklines=true, basicstyle=\ttfamily\small]
+/* USER CODE BEGIN PV */
+uint32_t pot_degeri = 0;
+float voltaj = 0.0f;
+char sepet[55];
+/* USER CODE END PV */
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, frame=single, numbers=none, breaklines=true, basicstyle=\ttfamily\small]
+while (1)
+{
+    HAL_ADC_Start_IT(&hadc1);
+
+    HAL_Delay(300);
+}
+\end{lstlisting}
+
+Sürekli okumayı kapattığımızdan dolayı 300 milisaniyede bir işlemciye şunu demiş oluyorsun: ADC uyudu, git onu tekrar dürt ve yeni bir ölçüm başlat deriz.
+
+\begin{lstlisting}[language=C, frame=single, numbers=none, breaklines=true, basicstyle=\ttfamily\small]
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+    if(hadc->Instance == ADC1)
+    {
+        pot_degeri = HAL_ADC_GetValue(&hadc1);
+
+        float voltaj = ((float)pot_degeri * 3.3f) / 4095.0f;
+
+        int len = sprintf(sepet, "Voltaj: %.2f V\r\n", voltaj);
+
+        HAL_UART_Transmit(&huart2, (uint8_t*)sepet, len, 10);
+    }
+}
+\end{lstlisting}
+
+\vspace{0.5cm}
+\noindent
+\textbf{\texttt{void HAL\_ADC\_ConvCpltCallback(ADC\_HandleTypeDef* hadc)}} \\
+Bu kodun amacı; donanım fiziksel işini bitirip, bu fonksiyonu tetikler ve yazdığımız koda atar. Onun harici gerisi dünki \texttt{while} ile yazılan yazılamla aynıdır.
+\vspace{10cm}
+\section*{Görev: Delay Komutunun İncelenmesi}
+
+\begin{lstlisting}[language=C, frame=single, numbers=none, breaklines=true, basicstyle=\ttfamily\small]
+void yrt_delay(uint32_t bekleme_suresi_ms)
+{
+    uint32_t baslangic_zamani = HAL_GetTick();
+
+    while ((HAL_GetTick() - baslangic_zamani) < bekleme_suresi_ms)
+    {
+
+    }
+}
+
+while (1)
+{
+    HAL_ADC_Start_IT(&hadc1);
+
+    yrt_delay(300);
+}
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{void} işini bitirdiğinde senin eline fiziksel olarak bir obje vermez. Sadece ondan istenen eylemi gerçekleştirmiş ve kenara çekilir, sana bir \texttt{int} değeri gibi bir değer vermez.
+    \item \texttt{uint32\_t} işaretsiz 32-bit tam sayı. Sadece 0 ve pozitif sayıları barındırır, o yüzden de işaretsizdir.
+    \item \texttt{void yrt\_delay(uint32\_t bekleme\_suresi\_ms)} kısmındaki \texttt{bekleme\_suresi\_ms} kısmı, tekrar kullanılabilir olmasını sağlayan en kilit noktadır.
+    \item \texttt{uint32\_t baslangic\_zamani = HAL\_GetTick();} bunun nedeni ilk başlama zamanını not etmektir. Yemek pişmesi için fırına atacaksan ilk saate bakarsın, onun gibi.
+    \item \texttt{while ((HAL\_GetTick() - baslangic\_zamani) < bekleme\_suresi\_ms) \{ \}} Buradaki ana amaç; \texttt{while ( (Şu Anki Saat - Başlangıç Saati) < Bekleme Süresi )}, bizim istediğimiz saat olmadan döngüden çıkamaz ve devam eder. Bu yüzden \texttt{while} içi boş.
+    \item \texttt{yrt\_delay(300);} ADC'den sadece 1 kez veri alıyor ve ardından 300 milisaniye boyunca hiçbir okuma yapmadan boş boş bekliyor.
+\end{itemize}
+
+\end{document}
