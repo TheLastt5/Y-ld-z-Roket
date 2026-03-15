@@ -80,3 +80,18 @@ Yüksek hızlı ADC (Analog-Dijital Dönüştürücü) ve bazı özel iletişim 
 Basic timer Sadece kendi içine kapalı bir şekilde sayar ve işlemciye haber verir (Interrupt). basic timer pwm üretemez
 
 General Purpose Timer Dış dünyaya açılan özel kapıları (Kanalları - Channels) vardır. İşlemcinin fiziksel pinlerine bağlanabilirler. Bu sayede dışarıdan gelen bir sinyali doğrudan okuyabilir veya dışarıya bir sinyal gönderebilirler.
+
+TIM6 kronometresini çalıştır ve süresi dolup başa sardığında yani ARR değerine ulaştığında arkadan işlemciyi dürtüp haber ver demektir HAL_TIM_Base_Start_IT(&htim6); komutu 
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) Timer'ın süresi dolduğu an, işlemci o sırada while(1) içinde ne yapıyorsa anında bırakır ve ışınlanarak bu fonksiyona gelir.
+
+TIM: Bu işlemin Timer (Zamanlayıcı) modülüyle ilgili olduğunu gösterir.
+
+PeriodElapsed: "Periyot Doldu" veya "Süre Bitti" demektir. Yani kronometremiz (sayaç) o belirlediğimiz tavan değere (ARR değerine) ulaşıp sıfırlandığı anı ifade eder.
+
+Callback geri çağı 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) timer süresine geldiği an bu kodu çağır demek 
+
+(TIM_HandleTypeDef *htim) bu kargocudur bütün timerlar buraya geldiği için bu onlara işaret atıyor 
+
+ if(htim->Instance == TIM6) işaret attığı içinde burdan kontrol ediyor
