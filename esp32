@@ -93,5 +93,30 @@ Callback geri çağı
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) timer süresine geldiği an bu kodu çağır demek 
 
 (TIM_HandleTypeDef *htim) bu kargocudur bütün timerlar buraya geldiği için bu onlara işaret atıyor 
-
  if(htim->Instance == TIM6) işaret attığı içinde burdan kontrol ediyor
+
+Her BMP180 sensörü fabrikadan çıktığında "parmak izi" gibi kendine has ufak üretim farklılıklarıyla gelir. Bir sensörün içindeki metal parça 25 derecede farklı bir tepki verirken, yanındaki diğer sensörün içindeki parça çok az daha farklı tepki verebilir bu yüzden BMP180_UpdateCalibrationData(); kodunu yazarak sisteme tanıtır
+
+BMP180_Init(&hi2c1); komutunu bmp180 nin hangi i2c1 ile haberleştiğini söyler
+
+ucus_irtifa = 44330.0 * (1.0 - pow((ucus_basinc / 101325.0), (1.0 / 5.255)));
+
+44330.0 Sayısı Nereden Geliyor?: Atmosferde yukarı doğru çıktıkça sıcaklık her 1000 metrede yaklaşık 6.5 derece düşer (Lapse Rate). Deniz seviyesindeki standart sıcaklık (15 $^\circ$C veya 288.15 Kelvin) bu düşüş oranına bölündüğünde ortaya çıkan fiziksel sabittir. 
+
+BMP180_GetTemperature(): Bu fonksiyon kütüphanenin içinde tanımlanmıştır. Çağırdığın anda işlemcin sensöre gider, ham sıcaklık verisini okur ve kütüphanedeki matematiksel formülleri kullanarak sana santigrat derece cinsinden bir sonuç döndürür.
+
+BMP180_GetPressure(): Bu da aynı şekilde kütüphane dosyandadır. Sensörden gelen ham basınç verisini alır, daha önce çektiğin kalibrasyon katsayılarıyla işler ve sana gerçek hava basıncını Pascal biriminde verir.
+
+strlen(telemetri_mesaji) (Mesaj Ne Kadar Uzun?)
+Anlamı: Gönderilecek yazının karakter sayısını otomatik hesaplar.
+
+strlen(telemetri_mesaji) İşlemciye "Sadece mesajın bittiği yere kadar veri gönder, hafızadaki diğer boşlukları gönderme" demiş olursun. Mesajın 50 karakterse 50, 80 ise 80 byte gönderilir.
+
+C programlama dilinin temel çalışma mantığı ve "Modüler Programlama" yapısıyla ilgilidir. Aslında arka planda .c dosyası da işin içindedir, ancak biz onu kodun en üstüne yazmayız.
+
+İşte neden sadece .h dosyasını include ettiğimizin mantığı:
+
+1. Dosyaların Görev Dağılımı
+.h (Header/Başlık) Dosyası: Bu dosya bir "İçindekiler" sayfası gibidir. İçinde fonksiyonların sadece isimleri ve giriş-çıkış parametreleri yazar. Sen #include dediğinde, işlemciye "Bak birazdan BMP180_GetTemperature diye bir fonksiyon kullanacağım, şaşırma, onun tarifi bu dosyada var" dersin.
+
+.c (Source/Kaynak) Dosyası: Bu dosya ise **"Yemek Tarifi"**nin kendisidir. Fonksiyonun içindeki tüm o karmaşık matematiksel işlemler, I2C komutları ve döngüler burada yazılıdır.
