@@ -80,4 +80,67 @@ UcusDurumu roket_durumu = BEKLEME;
 float max_irtifa = 0.0;
 
 /* USER CODE END PV */
+// Hareketli Ortalama Filtresi tabi doğruysa 
+float Hareketli_Ortalama_Filtresi(float yeni_deger) {
+    irtifa_dizisi[filtre_indeks] = yeni_deger;
+    filtre_indeks++;
+
+    if (filtre_indeks >= FILTRE_BOYUTU) {
+        filtre_indeks = 0; // Dizinin başına dön işler karışmasın 
+    }
+
+    float toplam = 0.0;
+    for (int i = 0; i < FILTRE_BOYUTU; i++) {
+        toplam += irtifa_dizisi[i];
+    }
+    return (toplam / FILTRE_BOYUTU);
+}
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+  MX_ADC1_Init();
+  MX_TIM6_Init();
+  MX_I2C1_Init();
+  /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim6);
+    BMP180_Init(&hi2c1);
+    BMP180_SetOversampling(BMP180_ULTRA);
+    BMP180_UpdateCalibrationData();
+
+    // Rampada Sıfırlama 1 saniye olsun diye 50 x 20 yaptım 
+    float toplam_basinc = 0;
+    for(int i = 0; i < 50; i++) {
+        toplam_basinc += (float)BMP180_GetPressure();
+        HAL_Delay(20);
+    }
+    yer_basinci = toplam_basinc / 50.0; // Yerin referans basıncı hesaplandı
 
