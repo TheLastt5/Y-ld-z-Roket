@@ -179,7 +179,7 @@ int main(void)
     	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_SET);
 
     	                // Pimi çekmişiz kapatmayı unutmuşuz ondan ekledim ---
-    	                HAL_Delay(2000); // 2 saniye boyunca elektrik ver barutun iyice yanması için
+    	                HAL_Delay(3000); // 3 saniye boyunca elektrik ver barutun iyice yanması için
     	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_RESET); // Elektriği KES
 
     	                roket_durumu = APOGEE_TESPIT;
@@ -191,16 +191,16 @@ int main(void)
     	            break;
 
     	        case DUSUS:
-    	            // Merin verdiği ana paraşüt irtifasının altına inildi mi?
-    	        	if(filtrelenmis_irtifa <= ANA_PARASUT_HEDEF) {
+    if(filtrelenmis_irtifa <= ANA_PARASUT_HEDEF) {
+        // 2. AYRILMA: Ana Paraşütü Ateşle
+        HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_SET);
+        
+        HAL_Delay(3000); // Barutun yanması için bekle
+        HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_RESET); // Elektriği KES!
 
-    	            	                // 2. AYRILMA: Ana Paraşütü Ateşle
-    	            	                HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_SET);
-
-    	            	                roket_durumu = ANA_PARASUT_ACIK;
-    	            	            }
-    	            	            break;
-
+        roket_durumu = ANA_PARASUT_ACIK;
+    }
+    break;
     	        case ANA_PARASUT_ACIK:
     	            // Yere indiğini anla
     	            if(filtrelenmis_irtifa < 10.0) {
