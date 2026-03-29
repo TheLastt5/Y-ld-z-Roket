@@ -143,4 +143,78 @@ int main(void)
         HAL_Delay(20);
     }
     yer_basinci = toplam_basinc / 50.0; // Yerin referans basıncı hesaplandı
+    while (1)
+    {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+    	ucus_sicaklik = BMP180_GetTemperature();
+    	    ucus_basinc = (float)BMP180_GetPressure();
+
+    	    // İrtifa hesaplama (Hareket filtresine sokmadığım veri)
+    	    ucus_irtifa = 44330.0 * (1.0 - pow((ucus_basinc / yer_basinci), (1.0 / 5.255)));
+
+    	    // Filtreden geçirme işlemi (G kuvveti ve dalgalanmalara karşı)
+    	    filtrelenmis_irtifa = Hareketli_Ortalama_Filtresi(ucus_irtifa);
+
+    	    // ROKET KURTARMA ALGORİTMASI
+    	    switch(roket_durumu) {
+
+    	        case BEKLEME:
+    	            // Roket 15 metre kalkarsa yükselmiştir 
+    	            if(filtrelenmis_irtifa > 15.0) {
+    	                roket_durumu = YUKSELIS;
+    	            }
+    	            break;
+
+    	        case YUKSELIS:
+    	            	            // Zirveyi  sürekli yenile
+    	            	            if(filtrelenmis_irtifa > max_irtifa) {
+    	            	                max_irtifa = filtrelenmis_irtifa;
+    	            	            }
+    	            	            // Zirveden 5 metre aşağı düştüysek, Apogee geçilmiştir!
+    	            	            else if((max_irtifa - filtrelenmis_irtifa) > APOGEE_ESIK_DEGERI) {
+
+    	            	                // 1. AYRILMA: Sürüklenme Paraşütünü Ateşle
+    	            	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_SET);
+
+    	            	                roket_durumu = APOGEE_TESPIT;
+    	            	            }
+    	            	            break;
+
+    	        case APOGEE_TESPIT:
+    	            roket_durumu = DUSUS;
+    	            break;
+
+    	        case DUSUS:
+    	            // Merin verdiği ana paraşüt irtifasının altına inildi mi?
+    	        	if(filtrelenmis_irtifa <= ANA_PARASUT_HEDEF) {
+
+    	            	                // 2. AYRILMA: Ana Paraşütü Ateşle
+    	            	                HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_SET);
+
+    	            	                roket_durumu = ANA_PARASUT_ACIK;
+    	            	            }
+    	            	            break;
+
+    	        case ANA_PARASUT_ACIK:
+    	            // Yere indiğini anla
+    	            if(filtrelenmis_irtifa < 10.0) {
+    	                roket_durumu = INIS_TAMAM;
+    	            }
+    	            break;
+
+    	        case INIS_TAMAM:
+
+    	            break;
+    	    }
+
+    	    // Telemetri ham ve filtrelenmiş irtifa burda
+    	    char telemetri_mesaji[120];
+    	    sprintf(telemetri_mesaji, "Ham: %.1f m | Filtre: %.1f m | Max: %.1f m | Durum: %d\r\n", ucus_irtifa, filtrelenmis_irtifa, max_irtifa, roket_durumu);
+
+    	    HAL_UART_Transmit(&huart2, (uint8_t*)telemetri_mesaji, strlen(telemetri_mesaji), 100);
+    	    HAL_Delay(100);
+    }
+  /* USER CODE END 3 */
 
