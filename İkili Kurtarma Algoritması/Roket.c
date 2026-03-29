@@ -168,19 +168,23 @@ int main(void)
     	            break;
 
     	        case YUKSELIS:
-    	            	            // Zirveyi  sürekli yenile
-    	            	            if(filtrelenmis_irtifa > max_irtifa) {
-    	            	                max_irtifa = filtrelenmis_irtifa;
-    	            	            }
-    	            	            // Zirveden 5 metre aşağı düştüysek, Apogee geçilmiştir!
-    	            	            else if((max_irtifa - filtrelenmis_irtifa) > APOGEE_ESIK_DEGERI) {
+    	            // Zirveyi sürekli yenile
+    	            if(filtrelenmis_irtifa > max_irtifa) {
+    	                max_irtifa = filtrelenmis_irtifa;
+    	            }
+    	            // Zirveden 5 metre aşağı düştüysek, Apogee geçilmiştir
+    	            else if((max_irtifa - filtrelenmis_irtifa) > APOGEE_ESIK_DEGERI) {
 
-    	            	                // 1. AYRILMA: Sürüklenme Paraşütünü Ateşle
-    	            	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_SET);
+    	                // 1. AYRILMA: Sürüklenme Paraşütünü Ateşle
+    	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_SET);
 
-    	            	                roket_durumu = APOGEE_TESPIT;
-    	            	            }
-    	            	            break;
+    	                // Pimi çekmişiz kapatmayı unutmuşuz ondan ekledim ---
+    	                HAL_Delay(2000); // 2 saniye boyunca elektrik ver barutun iyice yanması için
+    	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_RESET); // Elektriği KES
+
+    	                roket_durumu = APOGEE_TESPIT;
+                 }
+    	            break;
 
     	        case APOGEE_TESPIT:
     	            roket_durumu = DUSUS;
