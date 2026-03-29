@@ -59,4 +59,25 @@ float ucus_sicaklik = 0;
 float ucus_basinc = 0;
 float ucus_irtifa = 0;
 float yer_basinci = 0.0;
+// FİLTRE DEĞİŞKENLERİ
+#define FILTRE_BOYUTU 10
+float irtifa_dizisi[FILTRE_BOYUTU];
+uint8_t filtre_indeks = 0;
+float filtrelenmis_irtifa = 0.0;
+
+// YENİ EKLENENLER: Roket Uçuş Durumları
+typedef enum {
+    BEKLEME,            // fırlatma bekleniyor
+    YUKSELIS,           // Motor ateşlendi, irtifa artıyor
+    APOGEE_TESPIT,      // Tepe noktası
+    DUSUS,              // Sürüklenme paraşütü
+    ANA_PARASUT_ACIK,
+    INIS_TAMAM
+} UcusDurumu;
+
+UcusDurumu roket_durumu = BEKLEME;
+
+float max_irtifa = 0.0;
+
+/* USER CODE END PV */
 
