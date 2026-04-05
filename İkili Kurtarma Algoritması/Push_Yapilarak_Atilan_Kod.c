@@ -36,7 +36,7 @@
 /* USER CODE BEGIN PD */
 #define HEDEF_IRTIFA       8000.0  // Mert dedi
 #define ANA_PARASUT_HEDEF  2000.0  // Mert dedi
-#define APOGEE_ESIK_DEGERI 5.0 // Doğruluktan emin olmak için 5 metre düşüş istiyorum 
+#define APOGEE_ESIK_DEGERI 5.0 // Doğruluktan emin olmak için 5 metre düşüş istiyorum
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,6 +59,7 @@ float ucus_sicaklik = 0;
 float ucus_basinc = 0;
 float ucus_irtifa = 0;
 float yer_basinci = 0.0;
+
 // FİLTRE DEĞİŞKENLERİ
 #define FILTRE_BOYUTU 10
 float irtifa_dizisi[FILTRE_BOYUTU];
@@ -80,13 +81,27 @@ UcusDurumu roket_durumu = BEKLEME;
 float max_irtifa = 0.0;
 
 /* USER CODE END PV */
-// Hareketli Ortalama Filtresi tabi doğruysa 
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_TIM6_Init(void);
+static void MX_I2C1_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+// Hareketli Ortalama Filtresi tabi doğruysa
 float Hareketli_Ortalama_Filtresi(float yeni_deger) {
     irtifa_dizisi[filtre_indeks] = yeni_deger;
     filtre_indeks++;
 
     if (filtre_indeks >= FILTRE_BOYUTU) {
-        filtre_indeks = 0; // Dizinin başına dön işler karışmasın 
+        filtre_indeks = 0; // Dizinin başına dön işler karışmasın
     }
 
     float toplam = 0.0;
@@ -136,13 +151,17 @@ int main(void)
     BMP180_SetOversampling(BMP180_ULTRA);
     BMP180_UpdateCalibrationData();
 
-    // Rampada Sıfırlama 1 saniye olsun diye 50 x 20 yaptım 
+    // Rampada Sıfırlama 1 saniye olsun diye 50 x 20 yaptım
     float toplam_basinc = 0;
     for(int i = 0; i < 50; i++) {
         toplam_basinc += (float)BMP180_GetPressure();
         HAL_Delay(20);
     }
     yer_basinci = toplam_basinc / 50.0; // Yerin referans basıncı hesaplandı
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
     while (1)
     {
     /* USER CODE END WHILE */
@@ -160,58 +179,47 @@ int main(void)
     	    // ROKET KURTARMA ALGORİTMASI
     	    switch(roket_durumu) {
 
-    	        case BEKLEME:
-    	            // Roket 15 metre kalkarsa yükselmiştir 
-    	            if(filtrelenmis_irtifa > 15.0) {
-    	                roket_durumu = YUKSELIS;
-    	            }
-    	            break;
+    	        	        case BEKLEME:
+    	        	            if(filtrelenmis_irtifa > 15.0) {
+    	        	                roket_durumu = YUKSELIS;
+    	        	            }
+    	        	            break;
 
-    	        case YUKSELIS:
-    	            // Zirveyi sürekli yenile
-    	            if(filtrelenmis_irtifa > max_irtifa) {
-    	                max_irtifa = filtrelenmis_irtifa;
-    	            }
-    	            // Zirveden 5 metre aşağı düştüysek, Apogee geçilmiştir
-    	            else if((max_irtifa - filtrelenmis_irtifa) > APOGEE_ESIK_DEGERI) {
+    	        	        case YUKSELIS:
+    	        	            if(filtrelenmis_irtifa > max_irtifa) {
+    	        	                max_irtifa = filtrelenmis_irtifa;
+    	        	            }
+    	        	            else if((max_irtifa - filtrelenmis_irtifa) > APOGEE_ESIK_DEGERI) {
+    	        	                // 1. PARAŞÜT (SARI LED PA6) - BURADA YAKILIYOR
+    	        	                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+    	        	                roket_durumu = APOGEE_TESPIT;
+    	        	            }
+    	        	            break;
 
-    	                // 1. AYRILMA: Sürüklenme Paraşütünü Ateşle
-    	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_SET);
+    	        	        case APOGEE_TESPIT:
+    	        	            roket_durumu = DUSUS;
+    	        	            break;
 
-    	                // Pimi çekmişiz kapatmayı unutmuşuz ondan ekledim ---
-    	                HAL_Delay(3000); // 3 saniye boyunca elektrik ver barutun iyice yanması için
-    	                HAL_GPIO_WritePin(BARUT_APOGEE_GPIO_Port, BARUT_APOGEE_Pin, GPIO_PIN_RESET); // Elektriği KES
+    	        	        case DUSUS:
+    	        	            // 2. PARAŞÜT (PA7) - BURADA YAKILIYOR
+    	        	            if(filtrelenmis_irtifa <= ANA_PARASUT_HEDEF) {
+    	        	                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+    	        	                roket_durumu = ANA_PARASUT_ACIK; // Durumu hemen değiştiriyoruz ki tekrar girmesin
+    	        	            }
+    	        	            break;
 
-    	                roket_durumu = APOGEE_TESPIT;
-                 }
-    	            break;
+    	        	        case ANA_PARASUT_ACIK:
+    	        	            // Bu aşamada PA6 ve PA7 zaten SET edildi, dokunmuyoruz.
+    	        	            // Sadece yere iniş bekleniyor.
+    	        	            if(filtrelenmis_irtifa < 10.0) {
+    	        	                roket_durumu = INIS_TAMAM;
+    	        	            }
+    	        	            break;
 
-    	        case APOGEE_TESPIT:
-    	            roket_durumu = DUSUS;
-    	            break;
-
-    	        case DUSUS:
-    if(filtrelenmis_irtifa <= ANA_PARASUT_HEDEF) {
-        // 2. AYRILMA: Ana Paraşütü Ateşle
-        HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_SET);
-        
-        HAL_Delay(3000); // Barutun yanması için bekle
-        HAL_GPIO_WritePin(BARUT_ANA_GPIO_Port, BARUT_ANA_Pin, GPIO_PIN_RESET); // Elektriği KES!
-
-        roket_durumu = ANA_PARASUT_ACIK;
-    }
-    break;
-    	        case ANA_PARASUT_ACIK:
-    	            // Yere indiğini anla
-    	            if(filtrelenmis_irtifa < 10.0) {
-    	                roket_durumu = INIS_TAMAM;
-    	            }
-    	            break;
-
-    	        case INIS_TAMAM:
-
-    	            break;
-    	    }
+    	        	        case INIS_TAMAM:
+    	        	            // Her şey bitti, LED'ler yanmaya devam ediyor.
+    	        	            break;
+    	        	    }
 
     	    // Telemetri ham ve filtrelenmiş irtifa burda
     	    char telemetri_mesaji[120];
@@ -446,7 +454,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|GPIO_PIN_6|GPIO_PIN_7, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, BARUT_APOGEE_Pin|BARUT_ANA_Pin, GPIO_PIN_RESET);
@@ -457,12 +465,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : LD2_Pin PA6 PA7 */
+  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_6|GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BARUT_APOGEE_Pin BARUT_ANA_Pin */
   GPIO_InitStruct.Pin = BARUT_APOGEE_Pin|BARUT_ANA_Pin;
@@ -535,4 +543,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
