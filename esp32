@@ -132,3 +132,16 @@ Eğer bu pini boşta bırakırsan (havada sallanırsa), havadaki elektriksel gü
 Polling sürekli veri okumaktır Accelerometer ivme ölçer demektir
 
 Pow üstüne almak demektir pow((ucus_basinc / yer_basinci)
+
+ivme_ayari.Range = ADXL_RANGE_2G; range menzil demektir 2g de kısatlar bütün ivme ölçerlerde 2 nin katları şekilde verirsin g değerleri artıkça küçük değerleri umursamakta azalır 
+
+1 bit demek bitin açılıöı binary dijit ikili basamaktır
+
+HAL_IncTick() fonksiyonların ne kadar zaman geçtiğini anlaması için arka planda sürekli artan bir sayıya ihtiyacı vardır. İşte bu sayı, her 1 milisaniyede bir bu fonksiyon sayesinde artar.
+
+FreeRTOS, işlemcinin kendi sayacını (Systick) kendi iç işleri (görevler arası geçiş) için rezerve eder. bu pin bende tim7 dir
+
+  if (htim->Instance == TIM7)
+  {
+    HAL_IncTick();
+  }
