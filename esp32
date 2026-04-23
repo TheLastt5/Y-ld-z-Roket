@@ -145,3 +145,14 @@ FreeRTOS, işlemcinin kendi sayacını (Systick) kendi iç işleri (görevler ar
   {
     HAL_IncTick();
   }
+
+Atan değeri sadece arctan -90 ile 90 arasına bakabilir atan2 ise y ve z eksenlerine ayrı ayrı bakar böylece roketin 360 derecelik tam turundaki kesin konumunu ve yönünü şaşırmadan bulur.
+
+Yerçekimi vektörünün Y ve Z eksenleri arasındaki dik üçgen oranıdır.Formül {atan2}(y, z)
+
+pitch değeri roketin burnunun yukarı veya aşağı ne kadar baktığını gösterir. X ekseni ile yer düzlemi arasındaki açıdır.
+Trigonometrik Karşılığı: Yerçekimi vektörünün X ekseni üzerindeki bileşeninin, diğer eksenlerin bileşkesine oranıdır. {atan2}(-x, \sqrt{y^2 + z^2})
+
+Ax X ekseni, Pitch açısının sinüsü ile değişir) X ekseni, Pitch açısının sinüsü ile değişir 
+Y ekseni, hem Pitch hem Roll'e bağlıdır
+Z ekseni, her iki açının kosinüsüyle daralır
