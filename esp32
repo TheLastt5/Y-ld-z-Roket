@@ -218,3 +218,5 @@ float sayi_f32; hafızada 4 Byte yer kaplar.
 uint8_t array[4]; hafızada yan yana dizilmiş 4 tane 1 Byte'lık kutudur. Yani toplamı yine 4 Byte yer kaplar.
 
 İşlemciye şunu diyorsun: "Sana 4 Byte'lık bir alan veriyorum. Ben bu alana bazen tek parça büyük bir sayı (sayi_f32) olarak bakacağım, bazen de 4 tane küçük vagon (array) olarak bakacağım."
+
+int8_t *packet, int start_index yıldızlama ile paketin dosyası gelicek 
