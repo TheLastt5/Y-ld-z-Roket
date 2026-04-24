@@ -187,3 +187,17 @@ return converter.sayi_f32; bu komut kutu sırasını ters çevirir
 
 Big-Endian verileri büyükten küçüğe doğru vermesi 
 Little-Endian verileri küçükten büyüğe doğru vermesi
+volatile rame her seferinde yeni değer var mı diye sorar
+
+insert_float_to_packet parçalara ayırıp paketin içine yerleştiren fonksiyondur.
+ADXL_ReadAccel roketin uzaydaki hareketini (hızlanmasını, yavaşlamasını ve yönelimini) anlamanı sağlayan ham verileri sensörden çekip işlemcine getirir.
+
+Header (0xAB): En başta (Lokomotif).
+
+Veriler: Aradaki vagonlar (İrtifa, Basınç, İvme vb.).
+
+Checksum: Sondan üçüncü vagon (Güvenlik kontrolü).
+
+Footer 1 (0x0D): Sondan ikinci vagon.
+
+Footer 2 (0x0A): En son vagon.
