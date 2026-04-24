@@ -175,3 +175,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 İşlemci freetosla meşgulken herhangi acil bir elektrik sinyali geldiği an işlemci her şeyi bırakıp buraya dalar.
 
 Rx (Receive) bir cihazın dış dünyadan veri alma hattıdır.
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) UART üzerinden 34 byte'lık paket geldiğinde otomatik tetiklenen kesme fonksiyonudur.
+0xAA ve 0x22 (SUT Başlat) komutunu gördüğünde SUT_Modu_Aktif = true yaparak işlemciye "Kendi sensörlerini kör et, artık sanal verilerle uçuyoruz" der.
+0xAA ve 0x24 (SUT Durdur) gördüğünde sistemi anında normal uçuş moduna döndürür.
+0xAB (Sentetik Veri) gördüğünde ise paket_hazir_mi = true bayrağını kaldırarak FreeRTOS SensorTask'ına "Yeni irtifa verisi geldi, hemen işle" komutunu verir. Donanımı kilitlemeden arka planda sürekli veri dinler.
+Tx konuşmak Rx dinlemek içindir 
+
+STM32 işlemcisi, sayıları hafızada "Little-Endian" (En Anlamlı Bayt En Sonda) formatında tutar 
+return converter.sayi_f32; bu komut kutu sırasını ters çevirir
+
+Big-Endian verileri büyükten küçüğe doğru vermesi 
+Little-Endian verileri küçükten büyüğe doğru vermesi
