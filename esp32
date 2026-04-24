@@ -201,3 +201,5 @@ Checksum: Sondan üçüncü vagon (Güvenlik kontrolü).
 Footer 1 (0x0D): Sondan ikinci vagon.
 
 Footer 2 (0x0A): En son vagon.
+
+Bool ya 2 seçenek vereceğini belirtirsin bool yazarak, bu fonksiyonun dünyaya sadece iki cevap verebileceğini ilan ediyorsun: "Evet, checksum doğru" (true) veya "Hayır, paket hatalı" (false).
