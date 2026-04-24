@@ -156,3 +156,22 @@ Trigonometrik Karşılığı: Yerçekimi vektörünün X ekseni üzerindeki bile
 Ax X ekseni, Pitch açısının sinüsü ile değişir) X ekseni, Pitch açısının sinüsü ile değişir 
 Y ekseni, hem Pitch hem Roll'e bağlıdır
 Z ekseni, her iki açının kosinüsüyle daralır
+UART gibi asenkron haberleşme sistemlerinde, alıcı tarafın (Ö-UKB veya test cihazı) yeni bir veri paketinin nerede başladığını bilmesi gerekir.belirli bir Header byte'ı (örneğin SUT veri paketleri için 0xAB ), "Dikkat, yeni bir paket başlıyor!" sinyalini verir.
+UKB, gelen verinin bir sensör verisi mi yoksa test başlatma/durdurma komutu mu olduğunu sadece ilk byte'a bakarak anlayabilir.
+
+Footer paket bitirici 2 byt dır 
+Checksum paket içindeki veri byte'larının toplanıp mod 256'sının alınmasıyla yapılır paket diyelim 300 lük bunu 256 bölüp kalanını sana verir
+
+FLOAT32: Bilgisayarlar ondalıklı sayıları (örneğin roketinin irtifası olan 8000.50 değerini) hafızada tutmak için standart bir format kullanır. Bu format toplam 32 bit uzunluğundadır.
+4 Byte: 8 bit = 1 Byte eder. Dolayısıyla 32 bitlik bir FLOAT32 sayısı, hafızada yan yana duran 4 Byte'lık (4 kutuluk) yer kaplar
+
+type casting veri tipini geçici olarak veya kalıcı olarak başka bir veri tipine dönüştürme işlemidir
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+  if(GPIO_Pin == GPIO_PIN_6){
+    ADXL_IntProto();
+  }
+}
+İşlemci freetosla meşgulken herhangi acil bir elektrik sinyali geldiği an işlemci her şeyi bırakıp buraya dalar.
+
+Rx (Receive) bir cihazın dış dünyadan veri alma hattıdır.
