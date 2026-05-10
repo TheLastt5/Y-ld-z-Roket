@@ -130,3 +130,25 @@ Uygulama Sunucusu (Application Server): Verinin şifresinin çözüldüğü ve s
 
 FSK, PSK ve QAM
 
+SK (Frequency Shift Keying - Frekans Kaydırmalı)
+Burada "Frekans" ile oynuyoruz. Frekans, sesin ince veya kalın olmasıdır.
+
+Nasıl Çalışır? Dijital "0" göndermek istediğinde radyodan kalın bir ses dalgası (düşük frekans) yollarsın.
+"1" göndermek istediğinde ise radyodan ince bir ses dalgası (yüksek frekans) yollarsın.
+
+Günlük Hayattan Örnek: Bir piyanoda iki tuş seçtiğini düşün. Sol tuşa basarsan "0", sağ tuşa basarsan "1" demek olsun. 
+Cihaz sürekli bu iki tuş arasında zıplayarak mesajı iletir. Eski çevirmeli modemlerin (dial-up) çıkardığı o garip "di-di-düü" sesleri tam olarak FSK mantığıyla çalışırdı.
+
+2. PSK (Phase Shift Keying - Faz Kaydırmalı)
+Burada "Faz" (zamanlama/ritim) ile oynuyoruz. Dalganın yüksekliği veya inceliği hiç değişmez, sadece ritmi aniden bozulur.
+
+Nasıl Çalışır? Normal ve pürüzsüz giden bir dalga (örneğin sürekli bir "1" gönderirken), birden bire tam tersine döner. 
+Yani dalga yukarı çıkması gerekirken aniden aşağı inmeye başlar. Bu ani "tersine dönme" (180 derece kırılma) hareketi, karşı tarafa "Dikkat, 1'den 0'a geçtim!" mesajı verir.
+
+3. QAM (Quadrature Amplitude Modulation - Karesel Genlik)
+İşte bu, modern internetin (Wi-Fi, 4G, 5G) bel kemiğidir. FSK ve PSK tek seferde sadece 1 bit (0 veya 1) gönderebilirken, QAM çok daha zekicedir.
+
+Nasıl Çalışır? QAM, hem sesin yüksekliğini (Genlik/Amplitude - bağırarak veya fısıldayarak konuşmak) hem de ritmini (Faz/Phase - PSK'daki gibi zamanlamayı) aynı anda değiştirir.
+İki özelliği birden değiştirebildiğin için, sadece "0" ve "1" demek yerine, tek bir hamlede "0011", "1010" gibi dörtlü, sekizli paketler (semboller) gönderebilirsin.
+
+FSK sesi inceltip kalınlaştırır, PSK sesin ritmini aniden tersine çevirir, QAM ise hem sesin yüksekliğini hem de ritmini değiştirerek aynı anda çok daha fazla veri taşır.
