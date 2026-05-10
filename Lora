@@ -128,3 +128,5 @@ Ağ Sunucusu (Network Server): Sistemin "Beyni"dir (Örneğin: The Things Networ
 
 Uygulama Sunucusu (Application Server): Verinin şifresinin çözüldüğü ve senin gerçekten anlamlı veriyi elde ettiğin yerdir. Kendi yazdığın bir telemetri arayüzü (dashboard), bir veritabanı veya analiz sunucun burasıdır.
 
+FSK, PSK ve QAM
+
