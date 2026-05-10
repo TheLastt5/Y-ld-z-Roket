@@ -52,3 +52,7 @@ Sonuç: Gördüğün gibi, rastgele bir gürültüyü, düzenli bir referans sin
 
 Lora benim sinyalimi anlaması için bant genişliği (BW) ve yayılım sinyali (SF) ayın girmen lazım senin sinyaline spesifik bir yükseliş açısı (eğim) verir bu sayede. Bu senin ağının imzasıdır.
 Alıcı cihaz, ayarladığın bu BW ve SF değerlerine bakarak, o imza eğiminin tam tersi açıyla düşen kusursuz bir "ayna" (down-chirp referans sinyali) üretir.
+
+BU sayede etrafta başka bir lora olsa bile düz bir dalga olamaz çünkü onun BW VE SF si farklıdır 
+
+En sonunda ise FFT uygulandığında benim göderdiğim veri ortaya çıkar fft bir süzgeç gibidir bunu belli eder 
