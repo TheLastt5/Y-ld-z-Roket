@@ -1,1 +1,54 @@
+LoRa (Long Range) çok düşük güçle çok uzun mesafelere veri gönderebilen bir haberleşme teknolojisidir.
 
+LoRa, CSS (Chirp Spread Spectrum) adı verilen bir modülasyon tekniği kullanır.
+
+CSS (Chirp Spread Spectrum) nedir
+frekansı zamanla artan (up-chirp) veya azalan (down-chirp) ses/sinyal demektir.
+
+LoRa'da gönderilmek istenen dijital veriler (1'ler ve 0'lar), bu up-chirp sinyallerinin zaman içindeki "başlangıç noktalarının kaydırılmasıyla" (time-shift) kodlanır. 
+Yani sinyal her zaman aynı eğimle artar, ancak farklı veriler için frekansın sıçrama yaptığı zamanlama değiştirilir.
+
+Demodülasyon alıcı antenin havada aldığı sinyalleri 0 ve 1 olarak çözümlemesi
+
+LoRa alıcısında mantığı
+
+Alıcı cihaza bir sinyal ulaştığında, alıcı bu sinyali kendi içinde ürettiği bir referans down-chirp (frekansı azalan sinyal) ile çarpar.
+
+Zamanla artan bir frekans ile zamanla azalan bir frekans çarpıldığında, ortaya zaman içinde değişmeyen, sabit frekanslı net bir ton (tek bir frekans tepe noktası) çıkar.
+
+Sistem bu sabit tona FFT (Hızlı Fourier Dönüşümü) uygulayarak frekans spektrumunda çok net bir "tepe noktası" (peak) tespit eder.
+
+Bu tepe noktasının grafikteki konumu, vericinin hangi sembolü gönderdiğini tam olarak söyler ve veri çözülmüş olur.
+
+Termal Gürültü (veya Johnson-Nyquist gürültüsü), elektronikte her zaman var olan, sıcaklıktan kaynaklı rastgele sinyal dalgalanmalarıdır. 
+Sıcaklık mutlak sıfırın (-273.15°C) üzerinde olduğu sürece, iletkenlerin içindeki elektronlar titreşir ve sisteme rastgele bir "karlanma" veya "tıslama" sesi eklerler 
+(Radyoda boş bir kanalı açtığında duyduğun o hışırtı termal gürültüdür). Bu gürültü seviyesine "Gürültü Tabanı" (Noise Floor) denir
+
+Normal iletişim sistemlerinde (örneğin FM radyo veya Wi-Fi), sinyali demodüle edebilmek (anlayabilmek) için gelen sinyal gücünün, bu termal gürültüden daha yüksek olması gerekir.
+
+Chirp modülasyonunun ve demodülasyon sırasındaki "referans sinyalle çarpma" işleminin sağladığı kazanç sayesinde LoRa, termal gürültü tabanının altında kalan (gürültüden daha zayıf olan) sinyalleri bile duyabilir ve çözebilir.
+
+De-chirping (Ters Çevirme)
+Alıcıya ulaşan sinyal (Up-chirp), havada yolculuk ederken üzerine çok miktarda termal gürültü eklenmiş bir sinyaldir. Alıcı bu gelen sinyali, kendi içinde ürettiği yerel bir Down-chirp (referans sinyali) ile çarpar.
+
+Matematiksel olarak bir up-chirp ile bir down-chirp'in çarpımı birbirini nötrler ve geriye sabit bir frekans kalır. Eğer gelen sinyalde bir zaman kayması (shift) varsa, bu sabit frekansın değeri de o kaymaya göre değişir.
+
+Termal gürültü (karlanma) ise doğası gereği "rastgele" (random) bir yapıdadır. 
+Beyaz gürültü (white noise) denmesinin sebebi de budur; tıpkı beyaz ışığın tüm renkleri barındırması gibi, beyaz gürültü de içinde tüm frekanslardan birazcık barındırır.
+
+De-chirping olayının özeti şudur 
+
+Senin Sinyalin (Düzenli): Frekansı saniyede 10, 20, 30, 40 diye düzenli artan bir up-chirp olsun.
+
+Alıcının Referans Sinyali (Ters Düzenli): Frekansı saniyede -10, -20, -30, -40 diye azalan bir down-chirp olsun.
+
+Çarpma (Toplama gibi düşünelim): (10-10=0), (20-20=0), (30-30=0), (40-40=0). Sonuç hep "0" çıkar. Yani kusursuz bir şekilde düz, sabit bir çizgi elde edersin.
+
+Gürültünün Durumu (Rastgele): Termal gürültü tamamen rastgeledir, hiçbir kuralı yoktur. Frekansları anlık olarak 7, 85, -12, 44 gibi tamamen kaotiktir.
+
+Gürültüyü Çarparsak: (7 - 10 = -3), (85 - 20 = 65), (-12 - 30 = -42), (44 - 40 = 4).
+
+Sonuç: Gördüğün gibi, rastgele bir gürültüyü, düzenli bir referans sinyaliyle çarptığında sonuç düzleşmez; yine rastgele, kaotik yeni bir gürültü elde edersin.
+
+Lora benim sinyalimi anlaması için bant genişliği (BW) ve yayılım sinyali (SF) ayın girmen lazım senin sinyaline spesifik bir yükseliş açısı (eğim) verir bu sayede. Bu senin ağının imzasıdır.
+Alıcı cihaz, ayarladığın bu BW ve SF değerlerine bakarak, o imza eğiminin tam tersi açıyla düşen kusursuz bir "ayna" (down-chirp referans sinyali) üretir.
