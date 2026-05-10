@@ -90,3 +90,41 @@ Slave Out: İşçiden (LoRa'dan) dışarı çıkan veri.
 Ne işe yarar? LoRa modülünün, mikrodenetleyiciye cevap verdiği veya bilgi taşıdığı kablodur.
 
 Senaryo: LoRa modülü bu kablodan şu mesajı yollar: "Abi havadan bir paket yakaladım, içindeki veri bu, al oku!", "Söylediğin gibi frekansı değiştirdim, haberin olsun."
+
+LoRaWAN (Ağ Katmanı - MAC): İletişim kurallarıdır. Kimin ne zaman konuşacağını, mesajın hangi yollardan geçip ana sunucuya ulaşacağını ve şifrelemeyi belirleyen global protokoldür.
+
+Eğer sadece iki tane standart LoRa modülünü (örneğin otonom bir hava aracındaki uçuş kontrolcüsü ile yer istasyonu arasında) doğrudan birbiriyle konuşturuyorsan
+bu Point-to-Point (Noktadan Noktaya) haberleşmedir LoRaWAN değildir. LoRaWAN, yüzlerce veya binlerce cihazın aynı anda internete bağlandığı devasa bir "Ağ (Network)" mimarisidir.
+
+LoRaWAN Mimarisi Nasıl Çalışır?
+Sistem "Yıldızların Yıldızı" (Star-of-Stars) topolojisi denilen bir yapıda çalışır. Geleneksel Wi-Fi ağlarından çok daha esnektir.
+
+Sistem 4 ana parçadan oluşur ve veri şu yolları izler:
+
+Uç Cihazlar (End Nodes): Senin geliştirdiğin uç birimlerdir. Üzerinde sensörleri, mikroişlemcisi ve LoRa çipi olan donanımlar.
+
+Ağ Geçitleri (Gateways): Çevredeki uç cihazlardan gelen LoRa sinyallerini (chirp'leri) anteniyle toplayan "baz istasyonları"dır. 
+Sinyali alır ve normal internet protokollerine (IP/TCP üzerinden Wi-Fi, Ethernet, 4G vb.) çevirerek sunucuya iletir. 
+Uç cihazlar belirli bir Gateway'e bağlı olmak zorunda değildir; cihazın gönderdiği bir mesajı menzil içindeki tüm Gateway'ler duyabilir.
+
+Ağ Sunucusu (Network Server): Sistemin "Beyni"dir (Örneğin: The Things Network - TTN). Gateway'lerden internet üzerinden gelen paketleri toplar. 
+Eğer aynı cihazın yolladığı mesajı bölgedeki 3 farklı Gateway duyup gönderdiyse, kopya mesajları siler (deduplication). 
+Hangi cihaza ne zaman cevap verileceğini koordine eder ve ağ trafiğini yönetir.
+
+Uygulama Sunucusu (Application Server): Verinin şifresinin çözüldüğü ve senin gerçekten anlamlı veriyi elde ettiğin yerdir. 
+Kendi yazdığın bir telemetri arayüzü (dashboard), bir veritabanı veya analiz sunucun burasıdır.
+
+Class A (Maksimum Güç Tasarrufu): Cihaz genelde uyku modundadır. Sadece sensör verisini gönderdiği an uyanır. Veriyi yolladıktan hemen sonra birinci ve ikinci alım pencerelerini (RX1, RX2) açıp "Bana gelen bir komut var mı?" diye çok kısa süre dinler, sonra geri uyur. Bu cihaza istediğin an dışarıdan komut gönderemezsin, cihazın uyanıp mesaj atmasını beklemek zorundasın. (Pille çok uzun süre çalışması gereken sistemler için).
+
+Class B (Dengeli Gecikme): A sınıfına ek olarak, cihaz önceden ağ ile senkronize edilmiş belirli zaman aralıklarında uyanıp dinleme yapar (Beacon). Hem güç tasarrufu sağlar hem de daha tahmin edilebilir bir gecikmeyle uzaktan komut alabilir.
+
+Class C (Sürekli Dinleyen): Cihaz sürekli uyanıktır ve dinlemededir. Ağdan gelen bir komutun gecikmesi (latency) neredeyse sıfırdır, gönderdiğin komut anında ulaşır. Ancak dinleme işlemi bataryayı çok hızlı tüketir. (Sürekli bir güç kaynağına bağlı sistemler veya anlık kontrol gerektiren otonom platformlar için idealdir).
+
+Uç Cihazlar (End Nodes): Senin geliştirdiğin uç birimlerdir. Üzerinde sensörleri, mikroişlemcisi ve LoRa çipi olan donanımlar.
+
+Ağ Geçitleri (Gateways): Çevredeki uç cihazlardan gelen LoRa sinyallerini (chirp'leri) anteniyle toplayan "baz istasyonları"dır. Sinyali alır ve normal internet protokollerine (IP/TCP üzerinden Wi-Fi, Ethernet, 4G vb.) çevirerek sunucuya iletir. Uç cihazlar belirli bir Gateway'e bağlı olmak zorunda değildir; cihazın gönderdiği bir mesajı menzil içindeki tüm Gateway'ler duyabilir.
+
+Ağ Sunucusu (Network Server): Sistemin "Beyni"dir (Örneğin: The Things Network - TTN). Gateway'lerden internet üzerinden gelen paketleri toplar. Eğer aynı cihazın yolladığı mesajı bölgedeki 3 farklı Gateway duyup gönderdiyse, kopya mesajları siler (deduplication). Hangi cihaza ne zaman cevap verileceğini koordine eder ve ağ trafiğini yönetir.
+
+Uygulama Sunucusu (Application Server): Verinin şifresinin çözüldüğü ve senin gerçekten anlamlı veriyi elde ettiğin yerdir. Kendi yazdığın bir telemetri arayüzü (dashboard), bir veritabanı veya analiz sunucun burasıdır.
+
