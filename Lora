@@ -56,3 +56,37 @@ Alıcı cihaz, ayarladığın bu BW ve SF değerlerine bakarak, o imza eğiminin
 BU sayede etrafta başka bir lora olsa bile düz bir dalga olamaz çünkü onun BW VE SF si farklıdır 
 
 En sonunda ise FFT uygulandığında benim göderdiğim veri ortaya çıkar fft bir süzgeç gibidir bunu belli eder 
+
+Lora temelde 8 pin yer vcc gnd 
+SPI haberleşmesi için 4 pin SCK MISO MOSI CS
+
+Kontrol ve kesme içinde 2 pine ihtiyaç var bunlar RST ve DIO0 dır 
+
+DIO0 pini Modül bir paketi başarıyla gönderdiğinde veya havadan yeni bir paket yakaladığında mikrodenetleyiciye Donanımsal Kesme (Interrupt) gönderir.
+Böylece kodun sürekli "veri geldi mi?" diye sormak (polling) zorunda kalmaz.
+
+SPI haberleşme ise elektronik çiplerin (mikrodenetleyiciler ve sensörler) yan yana dururken birbirleriyle çok yüksek hızda mesajlaşmasını sağlayan bir haberleşme kuralıdır.
+Patron ve işçiler vardır patron emir vermeden işçiler bir şey yapamaz patron esp32 veya stm32 işçi ise bu durumda lora olur
+
+Spı da okumak ve dinlemek için 2 farklı yol vardır bu sayede cihazlar hem okurken hem dinleyebilir
+
+MOSI (Master Out, Slave In): "Patron Konuşur, İşçi Dinler"
+
+Master Out: Patrondan (Mikrodenetleyiciden) dışarı çıkan veri.
+
+Slave In: İşçinin (LoRa'nın) içine giren veri.
+
+Ne işe yarar? Mikrodenetleyicinin LoRa modülüne emir verdiği kablodur.
+
+Senaryo: STM32 bu kablodan şu mesajı yollar: "Yayılım Faktörünü 7 yap", "Frekansı 868 MHz'e ayarla", "Şu 'Merhaba Dünya' paketini havaya fırlat!",
+
+
+MISO (Master In, Slave Out): "İşçi Konuşur, Patron Dinler"
+
+Master In: Patronun (Mikrodenetleyicinin) içine giren veri.
+
+Slave Out: İşçiden (LoRa'dan) dışarı çıkan veri.
+
+Ne işe yarar? LoRa modülünün, mikrodenetleyiciye cevap verdiği veya bilgi taşıdığı kablodur.
+
+Senaryo: LoRa modülü bu kablodan şu mesajı yollar: "Abi havadan bir paket yakaladım, içindeki veri bu, al oku!", "Söylediğin gibi frekansı değiştirdim, haberin olsun."
