@@ -9,7 +9,7 @@
 #define MS5611_I2C_ADDR_CSB_LOW  (0x77 << 1) 
 #define MS5611_I2C_ADDR_CSB_HIGH (0x76 << 1)
 
-/* Komut Setleri */
+/* Komutlar */
 #define MS5611_COMMAND_RESET   0x1E
 #define MS5611_COMMAND_C1      0xA2
 #define MS5611_COMMAND_C2      0xA4
