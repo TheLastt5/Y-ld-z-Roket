@@ -15,11 +15,11 @@ Gömülü sistemlerde, mikrodenetleyicilerin aynı anda birden fazla işi yapıy
 
 Azure RTOS sadece bir çekirdek değildir; yanında FileX (Dosya sistemi), NetX (Ağ yığını), USBX (USB yönetimi) gibi sistemle tam uyumlu çalışan güçlü modüllerle birlikte gelir.
 
-Filex: Microsoft'un geliştirdiği, gömülü sistemler için tasarlanmış yüksek performanslı, küçük boyutlu ve FAT uyumlu bir dosya yönetim sistemi kütüphanesidir.
+**Filex**: Microsoft'un geliştirdiği, gömülü sistemler için tasarlanmış yüksek performanslı, küçük boyutlu ve FAT uyumlu bir dosya yönetim sistemi kütüphanesidir.
 
-NetX: Cihazın internete veya yerel ağa bağlanması için gereken TCP/IP protokol yığınıdır. IPv4 ve IPv6'yı destekler, ayrıca MQTT, HTTP, TLS/SSL gibi üst seviye endüstriyel protokolleri de barındırır.
+**NetX**: Cihazın internete veya yerel ağa bağlanması için gereken TCP/IP protokol yığınıdır. IPv4 ve IPv6'yı destekler, ayrıca MQTT, HTTP, TLS/SSL gibi üst seviye endüstriyel protokolleri de barındırır.
 
-USBX: Mikrodenetleyicinin bir USB Host (örneğin cihaza klavye/bellek takma) veya USB Device (örneğin cihazı bilgisayara bağlayıp flash bellek gibi gösterme) olarak çalışmasını sağlayan USB yığınıdır.
+**USBX**: Mikrodenetleyicinin bir USB Host (örneğin cihaza klavye/bellek takma) veya USB Device (örneğin cihazı bilgisayara bağlayıp flash bellek gibi gösterme) olarak çalışmasını sağlayan USB yığınıdır.
 ## Neden Azure RTOS? FreeRTOS'tan Farkları Nelerdir?
 
 * **Hız:** Azure RTOS, görevler (thread'ler) arasındaki geçiş süresi bakımından FreeRTOS'a kıyasla çok daha hızlıdır. İşlemci, bir görevi bırakıp diğerine geçerken neredeyse hiç zaman kaybetmez.
