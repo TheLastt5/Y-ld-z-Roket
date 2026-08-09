@@ -49,7 +49,13 @@ Açılan listeden kartımız için uygun olan `STMicroelectronics.X-CUBE-AZRTOS-
 ![Paket İndirme](aa.jpeg)
 
 ### Adım 3: ThreadX Core Aktivasyonu
-İndirme bittikten sonra üst kısımdan `AZRTOS-F4` bölümünü genişletiyoruz. `RTOS ThreadX` altındaki `ThreadX` kısmını açıp **Core** seçeneğinin yanındaki kutucuğu işaretliyoruz. İşlem bitince bu sekmeyi kapatabiliriz.
+İndirme bittikten sonra üst kısımdan `AZRTOS-F4` bölümünü genişletiyoruz. `RTOS ThreadX` altındaki `ThreadX` kısmını açıp **Core** seçeneğinin yanındaki kutucuğu işaretliyoruz. Bu işlem temel olarak **Azure RTOS**'u sisteme dahil eder.
+
+Diğer seçeneklerin açıklamaları şöyledir:
+
+* **PerformanceInfo:** Sistem performansını ve thread (görev) istatistiklerini izlemek için kullanılır.
+* **TraceX support:** ThreadX'in olay izleme (event tracing) aracına veri sağlamak içindir. Sistemdeki geçişleri, kesmeleri ve thread değişimlerini adım adım loglayıp grafiksel olarak incelemenize yarar; ileri düzey hata ayıklama (debugging) yapmanızı sağlar.
+* **Low Power support:** Mikrodenetleyicinin düşük güç modlarına (Sleep, Stop vb.) geçerken RTOS zamanlayıcısının ve tick'lerinin düzgün yönetilmesini sağlar. Projeniz pil tasarrufu odaklı değilse (örneğin sürekli çalışacak bir sistemse) aktif edilmez.
 
 ![Core Seçimi](cc.jpeg)
 
