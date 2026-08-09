@@ -44,7 +44,7 @@ Azure RTOS'u açmak için `.ioc` yapılandırma ekranına giriyoruz. Üst menüd
 ![Software Packs Seçimi](bb.jpeg)
 
 ### Adım 2: Uygun Paketin İndirilmesi
-Açılan listeden kartımız için uygun olan `STMicroelectronics.X-CUBE-AZRTOS-F4` paketini bulup yanındaki **Install** butonuna basıyoruz.
+Açılan listeden kartımız için uygun olan `STMicroelectronics.X-CUBE-AZRTOS-F4` paketini bulup yanındaki **Install** butonuna basıyoruz. Bu paketi seçme sebebimiz, doğrudan **STM32F4** serisinin çevre birimleri (timers, interrupts, DMA vb.) ve bellek mimarisi için optimize edilmiş olmasıdır. Ayrıca bu paketi kurduğunuzda projenizin konfigürasyonu (saat ayarları, pin yapılandırmaları ve kütüphane bağımlılıkları) otomatik olarak yönetilir ve olası çakışmalar önlenir.
 
 ![Paket İndirme](aa.jpeg)
 
