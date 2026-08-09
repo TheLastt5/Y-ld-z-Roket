@@ -26,7 +26,7 @@ Azure RTOS sadece bir çekirdek değildir; yanında FileX (Dosya sistemi), NetX 
 * **Gelişmiş Bellek Yönetimi:** FreeRTOS gibi sistemlerde standart dinamik bellek yönetimi (heap) kullanıldığından, sistem gelen taleplere göre rastgele boyutlarda bellek ayırır. Azure RTOS'ta ise **Block Pool** yapısı vardır. Bu sayede baştan alanların hepsi aynı boyuttadır (örneğin 32 byte). Bir görevin belleğe ihtiyacı varsa kullanır, işi bitince alanı kusursuzca geri verir.
 * Eğer illa farklı büyüklüklerde bellek ayırmak gerekiyorsa, ThreadX **Byte Pool** sunar. Bu yapı FreeRTOS'un heap yönetimine benzer ancak ThreadX arka planda bellek parçalanmasını önlemek için boşlukları birleştirme (merging) gibi daha gelişmiş matematiksel algoritmalar kullanır.
 
-### Güvenlik Sertifikasyonları (Ana Avantaj)
+### Güvenlik Sertifikasyonları 
 Azure RTOS'un alanındaki en üst seviye sertifikalara sahip olması, onu FreeRTOS'un önüne geçiren en büyük etkendir:
 * **DO-178C:** Otonom sistemlerde ve roket aviyoniklerinde kullanılabilmesi için gereken en üst düzey uluslararası havacılık güvenlik sertifikası.
 * **TÜV SIL 4:** Sistemde oluşabilecek anormalliklere karşı yazılım bütünlüğünü koruduğunu kanıtlayan en yüksek endüstriyel güvenlik seviyesi.
