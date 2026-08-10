@@ -54,7 +54,7 @@ FreeRTOS'ta bir göreve sadece tek bir öncelik atanabilirken, ThreadX'te bir g�
 
 **Örnek Senaryo (FreeRTOS vs. ThreadX):**
 Sisteminizde 3 farklı görev olsun (ThreadX'te sayı küçüldükçe öncelik artar):
-* **Görev 1 (Kritik Aviyonik):** Öncelik = `2`
+* **Görev 1 (Kurtarma / Paraşüt Patlatma):** Öncelik = `2`
 * **Görev 2 (Sensör Okuma):** Öncelik = `5`
 * **Görev 3 (Telemetri Gönderimi):** Öncelik = `10` | Kesilme Eşiği = `4`
 
