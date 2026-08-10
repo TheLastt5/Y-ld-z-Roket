@@ -71,6 +71,13 @@ Sisteminizde 3 farklı görev olsun (ThreadX'te sayı küçüldükçe öncelik a
 * **Öncelik Tersi Dönmesini (Priority Inversion) Engeller:** Düşük öncelikli bir görevin elindeki kaynağı orta öncelikli bir görevin engellemesi sonucu yüksek öncelikli görevin beklemesi durumunu ek bir Mutex mantığı kurmadan engeller.
 * **Yönetim Kontrolü:** ThreadX'te bir görev çalışırken bile `tx_thread_preemption_change()` fonksiyonu ile bu eşik değeri anlık olarak değiştirilebilir.
 
+* **Olay Zincirleme (Event Chaining), Azure RTOS'ta bir görevin (thread) aynı anda birden fazla bağımsız nesneyi (kuyruk, semafor vb.) beklemesini sağlayan otomatik bir mekanizmadır.Freeartosta bu özellik yoktur manüel kodlamak zorundasın ve tam olarak aynı durum oluşmaz  ve bu cpu yu yorar ve işlem yavaştır 
+
+Otomatik Tetikleme: Bir kuyruğa veri geldiğinde veya bir semafor tetiklendiğinde, işletim sistemi arka planda otomatik olarak merkezi bir Olay Bayrağını (Event Flag) kaldırır.
+
+Tek Noktadan Bekleme: Ana göreviniz kuyrukları veya semaforları tek tek kontrol etmez (polling yapmaz). Sadece merkezi bayrak panosunun önünde uykuya yatar ve herhangi bir bayrak kalktığında uyanır.
+
+Decoupling: Veriyi gönderen taraf (örneğin bir sensör okuma fonksiyonu), sistemi nasıl uyandıracağını kodlamak zorunda kalmaz. Sadece veriyi kuyruğa atar, bayrağı kaldırma işini işletim sistemi kendi kendine halleder.
 ---
 
 ## STM32CubeIDE ile Azure RTOS Kurulum Adımları
