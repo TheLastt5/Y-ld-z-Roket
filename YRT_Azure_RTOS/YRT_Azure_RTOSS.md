@@ -109,7 +109,7 @@ Açılan sağ ekranda **RTOS ThreadX** kutucuğunu işaretliyoruz. Bu işlemi ya
 ![ThreadX Seçimi 2](ff.jpeg)
 
 ### Adım 5: Kod Üretimi ve SysTick Uyarısı
-Tüm ayarları yaptıktan sonra projeyi kaydetmek ve kodları üretmek için `Ctrl + S` yapıyoruz. Sistem size RTOS kullanımıyla ilgili bir uyarı penceresi çıkaracaktır. Bu pencerede kod üretimine **Yes** diyerek devam ediyoruz.
+Tüm ayarları yaptıktan sonra projeyi kaydetmek ve kodları üretmik için `Ctrl + S` yapıyoruz. Sistem size RTOS kullanımıyla ilgili bir uyarı penceresi çıkaracaktır. Bu pencerede kod üretimine **Yes** diyerek devam ediyoruz.
 
 ![Kod Üretim Uyarısı](gg.jpeg)
 
@@ -190,3 +190,25 @@ VOID status_led_entry(ULONG thread_input)
         tx_thread_sleep(100);                  /* 100 Tick Bekleme (CPU'yu serbest bırakır) */
     }
 }
+
+### Kod Bloklarının ve Parametrelerin Detaylı Açıklaması
+
+**1. Bellek ve Değişken Tanımlamaları**
+
+* **`TX_THREAD status_led_thread;`**: Thread'in çalışma durumunu, önceliğini ve dahili sayaçlarını tutan ThreadX kontrol yapısıdır.
+* **`UCHAR status_led_stack[1024];`**: Görevin çalışırken kendi yerel değişkenlerini, adresleri saklayacağı ve fonksiyon çağrılarını yöneteceği 1024 byte'lık özel bellek (stack) alanıdır.
+* **`VOID status_led_entry(ULONG thread_input);`**: Görevin ana kodunu barındıran fonksiyonun özel yeridir. ThreadX kuralı gereği bu fonksiyon geri dönüş değeri vermez (`VOID`) ve parametre olarak tek bir `ULONG` kabul eder.
+* **`ULONG` (Unsigned Long)**: ThreadX ve gömülü C kütüphanelerinde 32-bit işaretsiz tamsayı veri tipini temsil eder
+
+**2. `tx_thread_create` Parametre Dizilimi**
+
+* **Control Block** (`&status_led_thread`): Oluşturulan thread'e erişim sağlayan yönetim nesnesinin bellek adresi.
+* **Name** (`"Status LED Thread"`): TraceX gibi hata ayıklama (debug) araçlarında görevi ayırt etmeyi sağlayan metinsel isim.
+* **Entry Function** (`status_led_entry`): Görev sırası geldiğinde işlemcinin çalıştıracağı ana fonksiyonun adı (pointer adresi).
+* **Entry Input** (`0`): Görev fonksiyonu başlatılırken `thread_input` değişkenine aktarılan ilk veri. Başlangıç değeri gerekmiyorsa 0 yazılır.
+* **Stack Start** (`status_led_stack`): Görev için ayrılan bellek (stack) dizisinin başlangıç adresi.
+* **Stack Size** (`THREAD_STACK_SIZE`): Ayrılan bellek alanının byte cinsinden boyutu.
+* **Priority** (`10`): Görevin öncelik seviyesi. ThreadX'te sayı küçüldükçe öncelik artar (0 en yüksek, 31 varsayılan en düşük seviyedir).
+* **Preemption-Threshold** (`10`): Kesilme eşiği. Görev çalışırken kendisinden daha yüksek öncelikli görevlerin bu seviyeye kadar kendisini bölmesini engeller.
+* **Time Slice** (`TX_NO_TIME_SLICE`): Aynı öncelikteki görevler arasında zaman paylaşımı süresi. `TX_NO_TIME_SLICE` verildiğinde görev işini bitirene veya uyku moduna geçene kadar CPU'yu bırakmaz.
+* **Auto Start** (`TX_AUTO_START`): Sistemin açılışıyla görevin otomatik olarak çalışmaya başlamasını sağlar (`TX_DONT_START` verilirse manuel olarak `tx_thread_resume` ile başlatılması gerekir).
