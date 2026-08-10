@@ -13,24 +13,63 @@ Gömülü sistemlerde, mikrodenetleyicilerin aynı anda birden fazla işi yapıy
 
 **Azure RTOS**, çekirdeğinde **ThreadX** adı verilen bir yapı barındıran, Microsoft tarafından geliştirilmiş (yakın zamanda Eclipse Foundation'a devredilerek Eclipse ThreadX adını almıştır) son derece hızlı ve güvenilir bir gerçek zamanlı işletim sistemidir. Özellikle kaynakları kısıtlı olan mikrodenetleyicilerde (STM32 vb.) minimum bellek alanı kaplayarak maksimum performans verecek "picokernel" (çok küçük çekirdek) mimarisiyle tasarlanmıştır.
 
-Azure RTOS sadece bir çekirdek değildir; yanında FileX (Dosya sistemi), NetX (Ağ yığını), USBX (USB yönetimi) gibi sistemle tam uyumlu çalışan güçlü modüllerle birlikte gelir.
+Azure RTOS sadece bir çekirdek değildir; yanında FileX (Dosya sistemi), NetX (Ağ yığını), USBX (USB yönetimi) gibi sistemle tam uyumlu çalışan güçlü modüllerle birlikte gelir:
 
-**Filex**: Microsoft'un geliştirdiği, gömülü sistemler için tasarlanmış yüksek performanslı, küçük boyutlu ve FAT uyumlu bir dosya yönetim sistemi kütüphanesidir.
+* **FileX:** Microsoft'un geliştirdiği, gömülü sistemler için tasarlanmış yüksek performanslı, küçük boyutlu ve FAT uyumlu bir dosya yönetim sistemi kütüphanesidir.
+* **NetX:** Cihazın internete veya yerel ağa bağlanması için gereken TCP/IP protokol yığınıdır. IPv4 ve IPv6'yı destekler, ayrıca MQTT, HTTP, TLS/SSL gibi üst seviye endüstriyel protokolleri de barındırır.
+* **USBX:** Mikrodenetleyicinin bir USB Host (örneğin cihaza klavye/bellek takma) veya USB Device (örneğin cihazı bilgisayara bağlayıp flash bellek gibi gösterme) olarak çalışmasını sağlayan USB yığınıdır.
 
-**NetX**: Cihazın internete veya yerel ağa bağlanması için gereken TCP/IP protokol yığınıdır. IPv4 ve IPv6'yı destekler, ayrıca MQTT, HTTP, TLS/SSL gibi üst seviye endüstriyel protokolleri de barındırır.
+---
 
-**USBX**: Mikrodenetleyicinin bir USB Host (örneğin cihaza klavye/bellek takma) veya USB Device (örneğin cihazı bilgisayara bağlayıp flash bellek gibi gösterme) olarak çalışmasını sağlayan USB yığınıdır.
 ## Neden Azure RTOS? FreeRTOS'tan Farkları Nelerdir?
 
 * **Hız:** Azure RTOS, görevler (thread'ler) arasındaki geçiş süresi bakımından FreeRTOS'a kıyasla çok daha hızlıdır. İşlemci, bir görevi bırakıp diğerine geçerken neredeyse hiç zaman kaybetmez.
 * **Gelişmiş Bellek Yönetimi:** FreeRTOS gibi sistemlerde standart dinamik bellek yönetimi (heap) kullanıldığından, sistem gelen taleplere göre rastgele boyutlarda bellek ayırır. Azure RTOS'ta ise **Block Pool** yapısı vardır. Bu sayede baştan alanların hepsi aynı boyuttadır (örneğin 32 byte). Bir görevin belleğe ihtiyacı varsa kullanır, işi bitince alanı kusursuzca geri verir.
 * Eğer illa farklı büyüklüklerde bellek ayırmak gerekiyorsa, ThreadX **Byte Pool** sunar. Bu yapı FreeRTOS'un heap yönetimine benzer ancak ThreadX arka planda bellek parçalanmasını önlemek için boşlukları birleştirme (merging) gibi daha gelişmiş matematiksel algoritmalar kullanır.
 
-### Güvenlik Sertifikasyonları 
+### Güvenlik Sertifikasyonları
 Azure RTOS'un alanındaki en üst seviye sertifikalara sahip olması, onu FreeRTOS'un önüne geçiren en büyük etkendir:
 * **DO-178C:** Otonom sistemlerde ve roket aviyoniklerinde kullanılabilmesi için gereken en üst düzey uluslararası havacılık güvenlik sertifikası.
 * **TÜV SIL 4:** Sistemde oluşabilecek anormalliklere karşı yazılım bütünlüğünü koruduğunu kanıtlayan en yüksek endüstriyel güvenlik seviyesi.
 * **IEC 62304:** Kalp pili veya yaşam destek ünitelerinde kullanılabilir onayı.
+
+---
+
+### Preemption-Threshold™ Mekanizması (FreeRTOS vs. ThreadX)
+
+**1. FreeRTOS'taki Problem: Gereksiz Context Switching ve Mutex Karmaşası**
+
+FreeRTOS tamamen öncelik tabanlı (Priority-based Preemption) bir zamanlayıcı kullanır. FreeRTOS'ta önceliği `10` olan bir görev (Task A) çalışırken, önceliği `9` olan daha yüksek bir görev (Task B) hazır hale geldiğinde, Task A anında durdurulur ve CPU Task B'ye geçer.
+
+Eğer Task A kritik bir iş yapıyorsa (örneğin bir sensörden SPI ile paket topluyorsa veya ortak bir bellek alanına yazıyorsa), yarıda kesilmemek için ya kesmeleri (interrupts) kapatmak / `taskENTER_CRITICAL()` kullanmak ya da Mutex/Semaphore kullanmak zorundadır.
+
+Kesmeleri kapatmak sistemin genel tepki süresini bozar; Mutex kullanmak ise fazladan CPU döngüsü harcar ve Priority Inversion (Öncelik Tersi Dönmesi) gibi karmaşık sorunlara yol açar.
+
+**2. ThreadX Çözümü: Preemption-Threshold™ Nasıl Çalışır?**
+
+FreeRTOS'ta bir göreve sadece tek bir öncelik atanabilirken, ThreadX'te bir göreve hem **Öncelik (Priority)** hem de **Kesilme Eşiği (Preemption-Threshold)** atanır:
+
+* **Priority (Çalışma Önceliği):** Görevin işlemciyi ilk alma sırasındaki öncelik seviyesi.
+* **Preemption-Threshold (Kesilme Eşiği):** Görev çalışmaya başladıktan sonra önceliğinin geçici olarak yükseltildiği "koruma" seviyesi.
+
+**Örnek Senaryo (FreeRTOS vs. ThreadX):**
+Sisteminizde 3 farklı görev olsun (ThreadX'te sayı küçüldükçe öncelik artar):
+* **Görev 1 (Kritik Aviyonik):** Öncelik = `2`
+* **Görev 2 (Sensör Okuma):** Öncelik = `5`
+* **Görev 3 (Telemetri Gönderimi):** Öncelik = `10` | Kesilme Eşiği = `4`
+
+*Çalışma Mantığı:*
+1. **Görev 3** çalışmaya başladığı anda, ThreadX bu görevin görünmez önceliğini geçici olarak `4` seviyesine çıkarır.
+2. Bu sırada **Görev 2 (Öncelik 5)** çalışmak istese bile Görev 3'ü kesemez! Çünkü Görev 3'ün kesilme eşiği (`4`), Görev 2'nin önceliğinden (`5`) daha yüksektir. (FreeRTOS olsaydı Görev 2 anında Görev 3'ü keserdi).
+3. Ancak önceliği `2` olan **Görev 1 (Kritik Aviyonik)** hazır hale gelirse, eşik değerini (`4`) aştığı için Görev 3'ü anında keser.
+4. Görev 3 işini bitirdiğinde önceliği tekrar normale (`10`) döner.
+
+**3. FreeRTOS'a Kıyasla Yazılımsal Avantajları**
+
+* **Gereksiz Context Switch Yükünü Sıfırlar:** FreeRTOS'ta her ara görev geçişinde registers saklanır ve stack pointer değiştirilir. Preemption-Threshold, kritik olmayan ara kesilmeleri engelleyerek CPU’nun işlem gücünü boş yere harcamasını önler.
+* **Mutex Olmadan Critical Section Koruması:** FreeRTOS'ta aynı veri kaynağını paylaşan görevler için Mutex veya `taskENTER_CRITICAL()` gerekir. ThreadX'te ise kesilme eşiği sayesinde görev, işini bitirene kadar benzer öncelikteki diğer görevler tarafından bölünmeyeceğini garantiler.
+* **Öncelik Tersi Dönmesini (Priority Inversion) Engeller:** Düşük öncelikli bir görevin elindeki kaynağı orta öncelikli bir görevin engellemesi sonucu yüksek öncelikli görevin beklemesi durumunu ek bir Mutex mantığı kurmadan engeller.
+* **Yönetim Kontrolü:** ThreadX'te bir görev çalışırken bile `tx_thread_preemption_change()` fonksiyonu ile bu eşik değeri anlık olarak değiştirilebilir.
 
 ---
 
@@ -93,7 +132,7 @@ Zamanlayıcı olarak TIM6'yı atamak sadece görevi kime verdiğimizi belirler. 
 
 Yüksek hızlı veri işlediğimiz roket ve aviyonik sistemlerimizde bu 16 MHz'lik hız yetersiz kalır. TIM6'nın ve tüm sistemin tam performansta çalışması için saat hızını STM32F446RE kartımızın desteklediği maksimum hıza çıkarmalıyız.
 
-* Ortada mavi yazıyla belirtilen HCLK (MHz) kutucuğunun altında, kartımızın maksimum hızı olan **180**  yazar. Görevin gerekliliğine göre bu hız artırılabilir. Bu örnekte maksimum hız baz alınmıştır; değeri maksimum hıza alıp Enter'a basın.
+* Ortada mavi yazıyla belirtilen HCLK (MHz) kutucuğunun altında, kartımızın maksimum hızı olan **180** yazar. Görevin gerekliliğine göre bu hız artırılabilir. Bu örnekte maksimum hız baz alınmıştır; değeri maksimum hıza alıp Enter'a basın.
 
 * Bu değişikliği yaptığınızda, sistem eski ayarlarla 180 MHz'e ulaşamayacağını fark edecektir. Karşınıza *"No solution found using the current selected sources. Do you want to use other sources?"* şeklinde bir uyarı penceresi çıkacaktır. Bu pencereye **OK** diyerek otomatik hesaplama yapmasına izin verin.
 
