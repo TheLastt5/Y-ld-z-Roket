@@ -197,8 +197,8 @@ VOID status_led_entry(ULONG thread_input)
 
 * **`TX_THREAD status_led_thread;`**: Thread'in çalışma durumunu, önceliğini ve dahili sayaçlarını tutan ThreadX kontrol yapısıdır.
 * **`UCHAR status_led_stack[1024];`**: Görevin çalışırken kendi yerel değişkenlerini, adresleri saklayacağı ve fonksiyon çağrılarını yöneteceği 1024 byte'lık özel bellek (stack) alanıdır.
-* **`VOID status_led_entry(ULONG thread_input);`**: Görevin ana kodunu barındıran fonksiyonun imzasıdır. ThreadX kuralı gereği bu fonksiyon geri dönüş değeri vermez (`VOID`) ve parametre olarak tek bir `ULONG` kabul eder.
-* **`ULONG` (Unsigned Long)**: ThreadX mimarisinde 32-bit işaretsiz tamsayıyı (`uint32_t`) temsil eden veri tipidir. Görev ilk başlatıldığında dışarıdan sayısal bir değer veya bir veri yapısının (struct) bellek adresini (pointer cast ederek) geçirmek amacıyla kullanılır.
+* **`VOID status_led_entry(ULONG thread_input);`**: Görevin ana kodunu barındıran fonksiyonun özel yeridir. ThreadX kuralı gereği bu fonksiyon geri dönüş değeri vermez (`VOID`) ve parametre olarak tek bir `ULONG` kabul eder.
+* **`ULONG` (Unsigned Long)**: ThreadX ve gömülü C kütüphanelerinde 32-bit işaretsiz tamsayı veri tipini temsil eder
 
 **2. `tx_thread_create` Parametre Dizilimi**
 
