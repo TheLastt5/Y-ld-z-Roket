@@ -61,7 +61,7 @@ Sisteminizde 3 farklı görev olsun (ThreadX'te sayı küçüldükçe öncelik a
 *Çalışma Mantığı:*
 1. **Görev 3** çalışmaya başladığı anda, ThreadX bu görevin görünmez önceliğini geçici olarak `4` seviyesine çıkarır.
 2. Bu sırada **Görev 2 (Öncelik 5)** çalışmak istese bile Görev 3'ü kesemez! Çünkü Görev 3'ün kesilme eşiği (`4`), Görev 2'nin önceliğinden (`5`) daha yüksektir. (FreeRTOS olsaydı Görev 2 anında Görev 3'ü keserdi).
-3. Ancak önceliği `2` olan **Görev 1 (Kritik Aviyonik)** hazır hale gelirse, eşik değerini (`4`) aştığı için Görev 3'ü anında keser.
+3. Ancak önceliği `2` olan **Görev 1 (Kurtarma / Paraşüt)** hazır hale gelirse, eşik değerini (`4`) aştığı için Görev 3'ü anında keser.
 4. Görev 3 işini bitirdiğinde önceliği tekrar normale (`10`) döner.
 
 **3. FreeRTOS'a Kıyasla Yazılımsal Avantajları**
@@ -109,7 +109,7 @@ Açılan sağ ekranda **RTOS ThreadX** kutucuğunu işaretliyoruz. Bu işlemi ya
 ![ThreadX Seçimi 2](ff.jpeg)
 
 ### Adım 5: Kod Üretimi ve SysTick Uyarısı
-Tüm ayarları yaptıktan sonra projeyi kaydetmek ve kodları üretmek için `Ctrl + S` yapıyoruz. Sistem size RTOS kullanımıyla ilgili bir uyarı penceresi çıkaracaktır. Bu pencerede kod üretimine **Yes** diyerek devam ediyoruz.
+Tüm ayarları yaptıktan sonra projeyi kaydetmek ve kodları üretmik için `Ctrl + S` yapıyoruz. Sistem size RTOS kullanımıyla ilgili bir uyarı penceresi çıkaracaktır. Bu pencerede kod üretimine **Yes** diyerek devam ediyoruz.
 
 ![Kod Üretim Uyarısı](gg.jpeg)
 
@@ -142,4 +142,51 @@ Yüksek hızlı veri işlediğimiz roket ve aviyonik sistemlerimizde bu 16 MHz'l
 
 ![Clock Ayarı Tamamlandı](zzz.jpeg)
 
-Bu son adımla birlikte sisteminiz maksimum hıza ulaşmış olur. Artık hem RTOS zamanlamalarımız şaşmayacak hem de işlemcimiz projelerimiz için gereken tam performansta çalışacaktır. Kurulumunuz tamamlanmıştır!
+Bu son adımla birlikte sisteminiz maksimum hıza ulaşmış olur. Artık hem RTOS zamanlamalarımız şaşmayacak hem de işlemcimiz projelerimiz için gereken tam performansta çalışacaktır.
+
+---
+
+### Adım 8: İlk Görevi (Thread) Oluşturma ve Kodlama
+
+STM32CubeIDE kod ürettikten sonra ThreadX yapılandırmaları `main.c` yerine otomatik üretilen `AZURE_RTOS/App/app_azure_rtos.c` dosyası içerisinde yönetilir. RTOS başlatıldığında sistem `tx_application_define()` fonksiyonunu çağırır ve bu süreç `App_Azure_RTOS_Init()` üzerinden ilk görevlerimizi (thread) sisteme tanıtmamızı sağlar.
+
+**Örnek Thread Tanımlaması (`app_azure_rtos.c`):**
+
+```c
+#define THREAD_STACK_SIZE 1024
+
+/* Thread Kontrol Bloğu ve Stack Tanımlamaları */
+TX_THREAD status_led_thread;
+UCHAR status_led_stack[THREAD_STACK_SIZE];
+
+/* Görev Fonksiyon Prototipi */
+VOID status_led_entry(ULONG thread_input);
+
+UINT App_Azure_RTOS_Init(VOID *memory_ptr)
+{
+    UINT status = TX_SUCCESS;
+
+    /* Thread Oluşturma */
+    status = tx_thread_create(&status_led_thread,         /* 1. Thread Kontrol Bloğu */
+                              "Status LED Thread",        /* 2. Thread Adı */
+                              status_led_entry,           /* 3. Çalışacak Fonksiyon */
+                              0,                          /* 4. Başlangıç Parametresi */
+                              status_led_stack,           /* 5. Stack Alanı Adresi */
+                              THREAD_STACK_SIZE,          /* 6. Stack Boyutu (Byte) */
+                              10,                         /* 7. Çalışma Önceliği (Priority) */
+                              10,                         /* 8. Kesilme Eşiği (Preemption-Threshold) */
+                              TX_NO_TIME_SLICE,           /* 9. Zaman Dilimleme (Time Slice) */
+                              TX_AUTO_START);             /* 10. Başlatma Durumu */
+
+    return status;
+}
+
+/* Görev Döngüsü (Thread Entry) */
+VOID status_led_entry(ULONG thread_input)
+{
+    while(1)
+    {
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5); /* Durum LED'ini yak/söndür */
+        tx_thread_sleep(100);                  /* 100 Tick Bekleme (CPU'yu serbest bırakır) */
+    }
+}
